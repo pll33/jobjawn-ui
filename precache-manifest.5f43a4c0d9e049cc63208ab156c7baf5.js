@@ -4,19 +4,19 @@ self.__precacheManifest = [
     "url": "/jobjawn-ui/static/js/runtime~main.dec56cd8.js"
   },
   {
-    "revision": "5b5ed9c66a753f822c6a",
-    "url": "/jobjawn-ui/static/js/main.5b5ed9c6.chunk.js"
+    "revision": "2f5c56126afbb3e4f181",
+    "url": "/jobjawn-ui/static/js/main.2f5c5612.chunk.js"
   },
   {
     "revision": "aa2ea59c6f174d47465f",
     "url": "/jobjawn-ui/static/js/2.aa2ea59c.chunk.js"
   },
   {
-    "revision": "5b5ed9c66a753f822c6a",
-    "url": "/jobjawn-ui/static/css/main.5de2d5fd.chunk.css"
+    "revision": "2f5c56126afbb3e4f181",
+    "url": "/jobjawn-ui/static/css/main.ecb6605c.chunk.css"
   },
   {
-    "revision": "833d01ad02320429ad69fa90799a5292",
+    "revision": "26d4d7f0b958d6d9d3a7fbe93c49f560",
     "url": "/jobjawn-ui/index.html"
   }
 ];

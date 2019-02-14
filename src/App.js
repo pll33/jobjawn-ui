@@ -160,6 +160,7 @@ class App extends Component {
 
           this.setState(prevState => {
             return {
+              loading: false,
               data: {
                 ...prevState.data,
                 ...companyData

@@ -7,6 +7,7 @@ import React, { Component } from 'react';
 import Autosuggestion from './components/Autosuggestion';
 import FilterTag from './components/FilterTag';
 import Tag from './components/Tag'
+
 import './App.css';
 
 const CORS = 'https://cors-anywhere.herokuapp.com/';
@@ -54,7 +55,7 @@ function processCompanyData(companyData, locations) {
     }
 
   } else {
-    console.log(`Skipped job listings for "${companyData.company.name}", no jobs found.`);
+    console.log(`No jobs found: Skipped job listings for "${companyData.company.name}"`);
     return;
   }
 }
@@ -121,8 +122,8 @@ class App extends Component {
       }
     })
     .then(jsonListResponse => {
-      console.log(jsonListResponse);
-      let companyJSONs = jsonListResponse.data.map(company => company.download_url);
+      let companyJSONs = jsonListResponse.data.filter(file => file.name.substr(-4) === 'json').map(company => company.download_url);
+
       // let getURLs = companyJSONs.forEach(jsonURL => getCompanyJSON(jsonURL));
       let getURLs = [getCompanyJSON(companyJSONs[0]), getCompanyJSON(companyJSONs[1]), getCompanyJSON(companyJSONs[2])];
 
@@ -240,7 +241,7 @@ class App extends Component {
         prevState.filters.locations[cbIdx] = '';
         activeLocations--;
       }
-      
+
       return {
         filters: prevState.filters,
         activeLocations
@@ -272,7 +273,6 @@ class App extends Component {
       let filterDis = (this.state.activeDisciplines === 0) || (this.state.activeDisciplines > 0 && filters.disciplines.indexOf(jb.discipline) > -1);
       let filterLvl = (this.state.activeLevels === 0) || (this.state.activeLevels > 0 && filters.levels.indexOf(jb.level) > -1);
       let filterLoc = (this.state.activeLocations === 0) || (this.state.activeLocations > 0 && filters.locations.indexOf(jb.location) > -1);
-      console.log(jb, filterDis, filterLvl, filterLoc);
       return (filterDis && filterLvl && filterLoc);
     });
 

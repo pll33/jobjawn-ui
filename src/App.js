@@ -1,10 +1,8 @@
 import axios from 'axios';
-import * as Promise from 'bluebird';
 import RJSON from 'relaxed-json';
+import * as Promise from 'bluebird';
 import { Card, Collapse } from 'react-bootstrap';
-
 import React, { Component } from 'react';
-
 
 import Autosuggestion from './components/Autosuggestion';
 import FilterTag from './components/FilterTag';
@@ -271,11 +269,11 @@ class App extends Component {
 
     // filter out jobs that don't match the filter criteria
     jobs = (!activeFilters) ? jobs : jobs.filter(jb => {
-      let filterDis = (this.state.activeDisciplines > 0 && filters.disciplines.indexOf(jb.discipline) > -1);
-      let filterLvl = (this.state.activeLevels > 0 && filters.levels.indexOf(jb.level) > -1);
-      let filterLoc = (this.state.activeLocations > 0 && filters.locations.indexOf(jb.location) > -1);
+      let filterDis = (this.state.activeDisciplines === 0) || (this.state.activeDisciplines > 0 && filters.disciplines.indexOf(jb.discipline) > -1);
+      let filterLvl = (this.state.activeLevels === 0) || (this.state.activeLevels > 0 && filters.levels.indexOf(jb.level) > -1);
+      let filterLoc = (this.state.activeLocations === 0) || (this.state.activeLocations > 0 && filters.locations.indexOf(jb.location) > -1);
       console.log(jb, filterDis, filterLvl, filterLoc);
-      return (filterDis || filterLvl || filterLoc);
+      return (filterDis && filterLvl && filterLoc);
     });
 
     return (

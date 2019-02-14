@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/jobjawn-ui/precache-manifest.b9015a70af753503949663537623b87f.js"
+  "/jobjawn-ui/precache-manifest.5565cab63988720da7ce7fc7c11fc5bb.js"
 );
 
 workbox.clientsClaim();

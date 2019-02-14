@@ -11,8 +11,9 @@ body {
 }
 
 .card-job {
-  width: 50%;
-
+  width: 48%;
+  display: inline-block;
+  margin-right: 1%;
 }
 .card-body {
   padding: 0.5rem 1.25rem;

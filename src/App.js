@@ -68,6 +68,7 @@ class App extends Component {
     super(props);
 
     this.state = {
+      loading: true,
       data: {
         disciplines: [],
         levels: [],
@@ -259,6 +260,7 @@ class App extends Component {
   }
 
   render() {
+    let loading = this.state.loading;
     let data = this.state.data;
     let filters = this.state.filters;
     let activeFilters = (this.state.activeDisciplines > 0 || this.state.activeLevels > 0 || this.state.activeLocations > 0);
@@ -298,13 +300,13 @@ class App extends Component {
               <h3>Filters</h3>
               <div className="filters">
                 <h4>Discipline</h4>
-                {data.disciplines && 
+                {data.disciplines &&
                   <div className="filter filter-disciplines">
                     {data.disciplines.length > 0 && filters.disciplines.length > 0 && data.disciplines.map((dis, idx) =>
                       <FilterTag
                         label={dis}
                         checked={checkCheckboxState(filters.disciplines, idx)}
-                        handleCheckboxChange={(evt) => this.handleFilterDiscipline(idx, evt)} key={`dis${idx}`} 
+                        handleCheckboxChange={(evt) => this.handleFilterDiscipline(idx, evt)} key={`dis${idx}`}
                       />
                     )}
                   </div>
@@ -317,7 +319,7 @@ class App extends Component {
                       <FilterTag
                         label={lvl}
                         checked={checkCheckboxState(filters.levels, idx)}
-                        handleCheckboxChange={(evt) => this.handleFilterLevel(idx, evt)} key={`lvl${idx}`} 
+                        handleCheckboxChange={(evt) => this.handleFilterLevel(idx, evt)} key={`lvl${idx}`}
                       />
                     )}
                   </div>
@@ -339,7 +341,16 @@ class App extends Component {
 
               <h2>Listing</h2>
               <div className="job-listing">
-                {jobs.length > 0 && jobs.map((job, idx) => 
+                {(loading && jobs.length === 0) &&
+                  <div>Loading jobs list...</div>
+                }
+                {(!loading && activeFilters && jobs.length === 0) &&
+                  <div>No jobs found that match the filter criteria.</div>
+                }
+                {(!loading && !activeFilters && jobs.length === 0) &&
+                  <div>No jobs found.</div>
+                }
+                {jobs.length > 0 && jobs.map((job, idx) =>
                   (
                     <div className="card card-job mb-2" key={idx}>
                       <div className="card-body">
@@ -351,18 +362,13 @@ class App extends Component {
                           <a href={job.company_url} className="card-link">Company Website</a>
                         </div>
                         <div className="card-tags mb-0">
-                          <Tag label={job.discipline}></Tag><Tag label={job.level}></Tag>
+                          {job.discipline && <Tag label={job.discipline}></Tag>}
+                          {job.level && <Tag label={job.level}></Tag>}
                         </div>
                       </div>
                     </div>
                   )
                 )}
-                {(jobs.length === 0 && activeFilters) &&
-                  <div>No jobs found that match the filter criteria.</div>
-                }
-                {(jobs.length === 0 && !activeFilters) &&
-                  <div>No jobs found.</div>
-                }
               </div>
             </div>
           </div>

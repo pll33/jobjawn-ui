@@ -1,6 +1,5 @@
 import axios from 'axios';
 import RJSON from 'relaxed-json';
-import * as Promise from 'bluebird';
 import { Card, Collapse } from 'react-bootstrap';
 import React, { Component } from 'react';
 
@@ -32,8 +31,11 @@ function processCompanyData(companyData, locations) {
     let autosuggestions = [company.name];
 
     // Add company location to locations array if location doesn't already exist
-    if (locations.indexOf(company.location) === -1) {
+    if (locations.indexOf(company.location) === -1 && !!company.location) {
       locations.push(company.location)
+    } else if (!company.location) {
+      console.log(`WARNING: No location found for "${company.name}"`);
+      return;
     }
 
     // Loop through company's jobs and add company name, URL, location to each jobObj 
@@ -124,15 +126,15 @@ class App extends Component {
     .then(jsonListResponse => {
       let companyJSONs = jsonListResponse.data.filter(file => file.name.substr(-4) === 'json').map(company => company.download_url);
 
-      // let getURLs = companyJSONs.forEach(jsonURL => getCompanyJSON(jsonURL));
-      let getURLs = [getCompanyJSON(companyJSONs[0]), getCompanyJSON(companyJSONs[1]), getCompanyJSON(companyJSONs[2])];
+      let getURLs = companyJSONs.map(jsonURL => getCompanyJSON(jsonURL));
+      // let getURLs = [getCompanyJSON(companyJSONs[0]), getCompanyJSON(companyJSONs[1]), getCompanyJSON(companyJSONs[2])];
 
       // TO-DO: get JSON a few at a time instead of all at once OR do all processing server-side and pass the result JSON down to the client
       axios.all(getURLs)
       .then((responses) => {
 
         if (responses.length > 0) {
-          // set progress bar based on responses.length
+          // TO-DO: set progress bar based on responses.length
           let progressIdx = 0; 
           let companyData = responses.reduce((accumulator, currentRes, currentIndex) => {
             let jsonParsed = (typeof currentRes.data === 'object') ? currentRes.data : RJSON.parse(currentRes.data);
@@ -152,6 +154,7 @@ class App extends Component {
             jobs: [],
           });
 
+          companyData.locations.sort((a, b) => a.localeCompare(b));
           if (progressIdx === responses.length) this.initFilterLocations(companyData.locations);
 
           this.setState(prevState => {
@@ -278,78 +281,92 @@ class App extends Component {
 
     return (
       <div className="App">
-        <h1>JobJawn</h1>
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <h1>JobJawn</h1>
 
-        <h2>Search</h2>
-        <Autosuggestion
-          value={this.state.search}
-          onInputChange={this.onSearchInputChange}
-          data={data.autosuggest}
-        />
-
-        <h2>Filters</h2>
-        <h3>Discipline</h3>
-        {data.disciplines && 
-          <div className="filter filter-disciplines">
-            {data.disciplines.length > 0 && filters.disciplines.length > 0 && data.disciplines.map((dis, idx) =>
-              <FilterTag
-                label={dis}
-                checked={checkCheckboxState(filters.disciplines, idx)}
-                handleCheckboxChange={(evt) => this.handleFilterDiscipline(idx, evt)} key={dis} 
-              />
-            )}
-          </div>
-        }
-
-        <h3>Experience Level</h3>
-        {data.levels &&
-          <div className="filter filter-levels">
-            {data.levels.length > 0 && filters.levels.length > 0 && data.levels.map((lvl, idx) =>
-              <FilterTag
-                label={lvl}
-                checked={checkCheckboxState(filters.levels, idx)}
-                handleCheckboxChange={(evt) => this.handleFilterLevel(idx, evt)} key={lvl} 
-              />
-            )}
-          </div>
-        }
-
-        <h3>Location</h3>
-        {data.locations &&
-          <div className="filter filter-locations">
-            {data.locations.length > 0 && filters.locations.length > 0 && data.locations.map((loc, idx) =>
-              <FilterTag
-                label={loc}
-                checked={checkCheckboxState(filters.locations, idx)}
-                handleCheckboxChange={(evt) => this.handleFilterLocation(idx, evt)} key={loc}
-              />
-            )}
-          </div>
-        }
-
-        <h2>Listing</h2>
-        {jobs.length > 0 && jobs.map((job, idx) => 
-          (
-            <div className="card-job" key={idx}>
-              <a href={job.url}><h3>{job.title}</h3></a>
-              <div>
-                <a href={job.company_url}>
-                  {job.company}
-                </a> ({job.location})
+              <h3>Search</h3>
+              <div className="search mb-2">
+                <Autosuggestion
+                  value={this.state.search}
+                  onInputChange={this.onSearchInputChange}
+                  data={data.autosuggest}
+                />
               </div>
-              <Tag label={job.discipline}></Tag><Tag label={job.level}></Tag>
-              <div>
-                Found on {job.found}
+
+              <h3>Filters</h3>
+              <div className="filters">
+                <h4>Discipline</h4>
+                {data.disciplines && 
+                  <div className="filter filter-disciplines">
+                    {data.disciplines.length > 0 && filters.disciplines.length > 0 && data.disciplines.map((dis, idx) =>
+                      <FilterTag
+                        label={dis}
+                        checked={checkCheckboxState(filters.disciplines, idx)}
+                        handleCheckboxChange={(evt) => this.handleFilterDiscipline(idx, evt)} key={`dis${idx}`} 
+                      />
+                    )}
+                  </div>
+                }
+
+                <h4>Experience Level</h4>
+                {data.levels &&
+                  <div className="filter filter-levels">
+                    {data.levels.length > 0 && filters.levels.length > 0 && data.levels.map((lvl, idx) =>
+                      <FilterTag
+                        label={lvl}
+                        checked={checkCheckboxState(filters.levels, idx)}
+                        handleCheckboxChange={(evt) => this.handleFilterLevel(idx, evt)} key={`lvl${idx}`} 
+                      />
+                    )}
+                  </div>
+                }
+
+                <h4>Location</h4>
+                {data.locations &&
+                  <div className="filter filter-locations">
+                    {data.locations.length > 0 && filters.locations.length > 0 && data.locations.map((loc, idx) =>
+                      <FilterTag
+                        label={loc}
+                        checked={checkCheckboxState(filters.locations, idx)}
+                        handleCheckboxChange={(evt) => this.handleFilterLocation(idx, evt)} key={`loc${idx}`}
+                      />
+                    )}
+                  </div>
+                }
+              </div>
+
+              <h2>Listing</h2>
+              <div className="job-listing">
+                {jobs.length > 0 && jobs.map((job, idx) => 
+                  (
+                    <div className="card card-job mb-2" key={idx}>
+                      <div className="card-body">
+                        <p className="mb-1 text-muted"><small>Found on {job.found}</small></p>
+                        <h5 className="card-title">{job.title}</h5>
+                        <h6 className="card-subtitle mb-2 text-muted">{job.company} ({job.location})</h6>
+                        <div className="mb-2">
+                          <a href={job.url} className="card-link">Apply</a>
+                          <a href={job.company_url} className="card-link">Company Website</a>
+                        </div>
+                        <div className="card-tags mb-0">
+                          <Tag label={job.discipline}></Tag><Tag label={job.level}></Tag>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                )}
+                {(jobs.length === 0 && activeFilters) &&
+                  <div>No jobs found that match the filter criteria.</div>
+                }
+                {(jobs.length === 0 && !activeFilters) &&
+                  <div>No jobs found.</div>
+                }
               </div>
             </div>
-          )
-        )}
-        {(jobs.length === 0 && activeFilters) &&
-          <div>No jobs found that match the filter criteria.</div>
-        }
-        {(jobs.length === 0 && !activeFilters) &&
-          <div>No jobs found.</div>
-        }
+          </div>
+        </div>
       </div>
     );
   }

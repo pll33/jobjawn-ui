@@ -1,14 +1,15 @@
 
 :root {
   --timing: 0.08s;
-  --tagoff: #15528A;
+  --tagoff: #2F689C;
   --tagon: #1496BA;
+  --plain: #9BADBB;
 }
 
 .tag {
   display: inline-block;
   position: relative;
-  margin: 0 10px 0 0;
+  margin: 0 0.5rem 0.5rem 0;
 }
 
 .tag-filter input[type=checkbox] {
@@ -31,17 +32,19 @@
   display: block;
   background: var(--tagoff);
   text-transform: uppercase;
+  margin: 0;
+  line-height: 1.25;
 }
 
 .tag-plain label {
-  font-size: 12px;
+  font-size: 0.75rem;
   padding: 7px;
-  
+  background: var(--plain);
 }
 
 .tag-filter label{
-  font-size: 16px;
-  padding: 7px 34px 7px 18px;
+  font-size: 1rem;
+  padding: 7px 34px 7px 14px;
   position: relative;
   border-radius: 16px;
   transition: all var(--timing) ease-in;
